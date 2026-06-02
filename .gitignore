@@ -1,0 +1,175 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.example.local
+
+# IDE & Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# Backend (Maven)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/maven-wrapper.properties
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Backend (Gradle)
+backend/.gradle/
+backend/build/
+gradle-app.setting
+.gradletasknamecache
+*.gradle.kts~
+
+# Build & Compilation
+*.class
+*.jar
+*.war
+*.ear
+*.exe
+*.o
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/
+postgres_data/
+
+# Node & Frontend (duplicate for root visibility)
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local development
+.DS_Store
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+$RECYCLE.BIN/
+
+# Docker & Compose
+.docker/
+docker-compose.override.yml
+
+# Misc temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.#*
+
+# IDE plugins cache
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+.idea/shelf
+
+# IntelliJ
+*.iml
+*.iws
+*.ipr
+.idea/
+
+# Visual Studio Code
+.vscode/
+.history/
+*.code-workspace
+
+# Generated files
+/bin/
+/lib/
+/out/
+
+# Package manager lockfiles (optional - uncomment if you want to commit these)
+# frontend/package-lock.json
+# frontend/yarn.lock
+
+# Redis
+dump.rdb
+*.rdb
+
+# Compiled class file
+*.ctxt
+
+# BlueJ files
+*.bluej
+
+# Mobile Tools for Java (MOTODEV)
+*.mtj.tmp/
+
+# Package Files
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs
+hs_err_pid*
+
+# Local environment overrides
+local.properties
+gradle.properties
+settings.local.json
+
+# Test coverage
+coverage/
+.nyc_output/
+
+.claude
