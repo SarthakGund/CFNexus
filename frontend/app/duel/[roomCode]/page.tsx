@@ -364,7 +364,9 @@ function ParticipantsBar({ participants }: { participants: Participant[] }) {
 
 function CompletedView({ participants }: { participants: Participant[] }) {
   const result = useDuelStore((s) => s.result);
+  const roomType = useDuelStore((s) => s.room?.type);
   const winner = participants.find((p) => p.userId === result?.winnerId);
+  const isTeamDuel = roomType === "UNRATED_TEAM";
 
   const durationLabel =
     result?.solveDurationMs != null
@@ -384,8 +386,23 @@ function CompletedView({ participants }: { participants: Participant[] }) {
             <p className="text-lg font-semibold">It&apos;s a draw.</p>
           ) : winner ? (
             <p className="text-lg">
-              Winner:{" "}
-              <span className="font-mono font-semibold">{winner.handle}</span>
+              {isTeamDuel && winner.team != null ? (
+                <>
+                  Winner:{" "}
+                  <span className="font-semibold">Team {winner.team}</span>{" "}
+                  <span className="text-sm text-muted-foreground">
+                    (solved by{" "}
+                    <span className="font-mono">{winner.handle}</span>)
+                  </span>
+                </>
+              ) : (
+                <>
+                  Winner:{" "}
+                  <span className="font-mono font-semibold">
+                    {winner.handle}
+                  </span>
+                </>
+              )}
             </p>
           ) : (
             <p className="text-lg">No winner recorded.</p>
