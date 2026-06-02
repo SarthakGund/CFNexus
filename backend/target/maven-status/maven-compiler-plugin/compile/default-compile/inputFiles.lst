@@ -23,6 +23,9 @@ C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelResultRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelRoom.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelRoomRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\dto\LeaderboardEntryDto.java
+C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\LeaderboardController.java
+C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\LeaderboardRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\rating\dto\MatchHistoryDto.java
 C:\CFNexus\backend\src\main\java\com\cfduel\rating\dto\PagedResponse.java
 C:\CFNexus\backend\src\main\java\com\cfduel\rating\dto\RatingPointDto.java

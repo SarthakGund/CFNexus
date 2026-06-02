@@ -14,7 +14,8 @@
       "Bash(java -version)",
       "Bash(mvn -version)",
       "Bash(./mvnw -q -Djava.version=17 compile)",
-      "Bash(mvn -q -Djava.version=17 compile)"
+      "Bash(mvn -q -Djava.version=17 compile)",
+      "Bash(npx next *)"
     ]
   }
 }

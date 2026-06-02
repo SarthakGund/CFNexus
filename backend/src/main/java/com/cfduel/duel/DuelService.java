@@ -243,6 +243,14 @@ public class DuelService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "Not enough players to start");
         }
+        if (TYPE_UNRATED_TEAM.equals(room.getRoomType())) {
+            boolean team1 = participants.stream().anyMatch(p -> Integer.valueOf(1).equals(p.getTeam()));
+            boolean team2 = participants.stream().anyMatch(p -> Integer.valueOf(2).equals(p.getTeam()));
+            if (!team1 || !team2) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "A team duel needs at least one player on each team");
+            }
+        }
 
         List<String> handles = participantHandles(participants);
         CfProblem problem = problemSelectionService.selectProblem(handles, room.getProblemRating());
@@ -299,6 +307,7 @@ public class DuelService {
                 .problemId(room.getProblemId());
 
         // Rated 1v1: run the ELO engine, which also records rating + match history.
+        // Unrated team/FFA: no rating change, just bump the winners' unrated_wins.
         boolean draw = winnerUserId == null;
         if (TYPE_RATED_1V1.equals(room.getRoomType()) && participants.size() == 2) {
             if (draw) {
@@ -317,11 +326,37 @@ public class DuelService {
                         .loserRatingAfter(outcome.loserAfter())
                         .ratingDelta(outcome.delta());
             }
+        } else if (!draw && winnerUserId != null) {
+            awardUnratedWins(room, participants, winnerUserId, winnerTeam);
         }
         resultRepository.save(resultBuilder.build());
 
         broadcaster.broadcast(roomCode, new DuelEndedEvent(
                 winnerUserId, loserIds, resultType, solveDurationMs));
+    }
+
+    /**
+     * Credits the unrated win to the winning side (spec §8.2 / §8.3). For
+     * {@code UNRATED_TEAM} every member of the winning team gets {@code unrated_wins++};
+     * for {@code UNRATED_FFA} only the individual who solved is credited.
+     */
+    private void awardUnratedWins(
+            DuelRoom room, List<DuelParticipant> participants, UUID winnerUserId, Integer winnerTeam) {
+        List<UUID> winnerIds = new ArrayList<>();
+        if (TYPE_UNRATED_TEAM.equals(room.getRoomType()) && winnerTeam != null) {
+            for (DuelParticipant p : participants) {
+                if (winnerTeam.equals(p.getTeam())) {
+                    winnerIds.add(p.getUserId());
+                }
+            }
+        } else {
+            winnerIds.add(winnerUserId);
+        }
+
+        for (User winner : userRepository.findAllById(winnerIds)) {
+            winner.setUnratedWins((winner.getUnratedWins() == null ? 0 : winner.getUnratedWins()) + 1);
+            userRepository.save(winner);
+        }
     }
 
     @Transactional
