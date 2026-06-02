@@ -23,6 +23,15 @@ C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelResultRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelRoom.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelRoomRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\dto\MatchHistoryDto.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\dto\PagedResponse.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\dto\RatingPointDto.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\MatchHistory.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\MatchHistoryRepository.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\ProfileController.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\RatingHistory.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\RatingHistoryRepository.java
+C:\CFNexus\backend\src\main\java\com\cfduel\rating\RatingService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\user\dto\UpdateProfileRequest.java
 C:\CFNexus\backend\src\main\java\com\cfduel\user\dto\UserProfileDto.java
 C:\CFNexus\backend\src\main\java\com\cfduel\user\User.java

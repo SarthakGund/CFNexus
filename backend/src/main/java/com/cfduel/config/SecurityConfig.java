@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -65,6 +66,12 @@ public class SecurityConfig {
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html").permitAll()
+                // Public profile reads (SSR/SEO, spec §15): handle lookup + history.
+                .requestMatchers(HttpMethod.GET,
+                        "/api/users/*",
+                        "/api/users/*/rating-history",
+                        "/api/users/*/match-history",
+                        "/api/users/*/cf-rating-history").permitAll()
                 .anyRequest().authenticated())
             .oauth2Login(oauth -> oauth
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
