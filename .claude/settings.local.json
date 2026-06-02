@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Read(//c/c/CFNexus/**)",
+      "Read(//c/c/CFNexus/frontend/**)",
+      "Read(//c/c/CFNexus/frontend/components/**)",
+      "Bash(./mvnw -q -o compile)",
+      "Bash(mvn -q -o compile)",
+      "PowerShell(if \\(Test-Path C:\\\\CFNexus\\\\backend\\\\mvnw.cmd\\) { \"wrapper exists\" } else { \"no wrapper\" }; \\(Get-Command mvn -ErrorAction SilentlyContinue\\).Source)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "PowerShell(Remove-Item *)",
+      "Bash(java -version)",
+      "Bash(mvn -version)"
+    ]
+  }
+}

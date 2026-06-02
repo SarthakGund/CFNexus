@@ -1,0 +1,107 @@
+# CFNexus backend configuration.
+# All values bind to environment variables (spec §21) with localhost defaults
+# via ${VAR:default} so the app runs locally without a populated .env.
+
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+        # Secure cookies require HTTPS; override to false for plain-HTTP local dev.
+        secure: ${COOKIE_SECURE:true}
+        name: CFNEXUSSESSION
+
+spring:
+  application:
+    name: cfnexus-backend
+
+  # --- Datasource (PostgreSQL) ---
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/cfduel}
+    username: ${DB_USERNAME:cfduel}
+    password: ${DB_PASSWORD:secret}
+    driver-class-name: org.postgresql.Driver
+
+  # --- JPA / Hibernate ---
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  # --- Flyway ---
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # --- Redis (cache, presence, rate limiting) ---
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:redissecret}
+
+  # --- Spring Session backed by Redis ---
+  session:
+    store-type: redis
+    timeout: 7d
+    redis:
+      namespace: cfnexus:session
+
+  # --- Security / OAuth2 client (Codeforces) — spec §4 ---
+  security:
+    oauth2:
+      client:
+        registration:
+          codeforces:
+            client-id: ${CF_CLIENT_ID:changeme-cf-client-id}
+            client-secret: ${CF_CLIENT_SECRET:changeme-cf-client-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/codeforces"
+            scope: "user:info"
+            client-name: Codeforces
+        provider:
+          codeforces:
+            authorization-uri: https://codeforces.com/oauth/authorize
+            token-uri: https://codeforces.com/oauth/token
+            user-info-uri: https://codeforces.com/api/user.info
+            user-name-attribute: handle
+
+# --- Actuator (health, metrics) ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# --- SpringDoc OpenAPI / Swagger UI ---
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# --- Application-specific config ---
+app:
+  # Frontend origin used for CORS (spec §17: configured for frontend origin only).
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:3000}
+  cors:
+    allowed-origins: ${FRONTEND_ORIGIN:http://localhost:3000}
+  # Codeforces signed-API credentials (for user.status / problemset polling).
+  cf:
+    api-key: ${CF_API_KEY:}
+    api-secret: ${CF_API_SECRET:}
+  # Code runner (Judge0) proxy target.
+  code-runner:
+    url: ${CODE_RUNNER_URL:http://localhost:2358}
+    api-key: ${CODE_RUNNER_API_KEY:judge0-api-key}
