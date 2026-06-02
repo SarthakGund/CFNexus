@@ -12,7 +12,9 @@
       "Bash(npm run *)",
       "PowerShell(Remove-Item *)",
       "Bash(java -version)",
-      "Bash(mvn -version)"
+      "Bash(mvn -version)",
+      "Bash(./mvnw -q -Djava.version=17 compile)",
+      "Bash(mvn -q -Djava.version=17 compile)"
     ]
   }
 }

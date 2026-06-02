@@ -2,6 +2,7 @@ package com.cfduel.duel;
 
 import com.cfduel.cf.CfProblem;
 import com.cfduel.cf.ProblemSelectionService;
+import com.cfduel.rating.RatingService;
 import com.cfduel.duel.dto.CreateDuelRequest;
 import com.cfduel.duel.dto.CreateRoomResponse;
 import com.cfduel.duel.dto.JoinDuelRequest;
@@ -55,6 +56,7 @@ public class DuelService {
     private final DuelResultRepository resultRepository;
     private final UserRepository userRepository;
     private final ProblemSelectionService problemSelectionService;
+    private final RatingService ratingService;
     private final DuelBroadcaster broadcaster;
 
     @Value("${app.frontend-origin:http://localhost:3000}")
@@ -286,17 +288,37 @@ public class DuelService {
         room.setWinnerTeam(winnerTeam);
         roomRepository.save(room);
 
-        // One result row per loser (Phase 2: no ratings yet).
         UUID singleLoser = loserIds.size() == 1 ? loserIds.get(0) : null;
-        DuelResult result = DuelResult.builder()
+
+        DuelResult.DuelResultBuilder resultBuilder = DuelResult.builder()
                 .roomId(room.getId())
                 .winnerId(winnerUserId)
                 .loserId(singleLoser)
                 .resultType(resultType)
                 .solveDurationMs(solveDurationMs)
-                .problemId(room.getProblemId())
-                .build();
-        resultRepository.save(result);
+                .problemId(room.getProblemId());
+
+        // Rated 1v1: run the ELO engine, which also records rating + match history.
+        boolean draw = winnerUserId == null;
+        if (TYPE_RATED_1V1.equals(room.getRoomType()) && participants.size() == 2) {
+            if (draw) {
+                User a = requireUser(participants.get(0).getUserId());
+                User b = requireUser(participants.get(1).getUserId());
+                ratingService.applyDraw(room, a, b);
+            } else if (singleLoser != null) {
+                User winner = requireUser(winnerUserId);
+                User loser = requireUser(singleLoser);
+                RatingService.Decisive outcome =
+                        ratingService.applyDecisive(room, winner, loser, resultType, solveDurationMs);
+                resultBuilder
+                        .winnerRatingBefore(outcome.winnerBefore())
+                        .winnerRatingAfter(outcome.winnerAfter())
+                        .loserRatingBefore(outcome.loserBefore())
+                        .loserRatingAfter(outcome.loserAfter())
+                        .ratingDelta(outcome.delta());
+            }
+        }
+        resultRepository.save(resultBuilder.build());
 
         broadcaster.broadcast(roomCode, new DuelEndedEvent(
                 winnerUserId, loserIds, resultType, solveDurationMs));
@@ -325,6 +347,11 @@ public class DuelService {
     private DuelRoom requireRoom(String roomCode) {
         return roomRepository.findByRoomCode(roomCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+    }
+
+    private User requireUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     private String generateUniqueRoomCode() {
