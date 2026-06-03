@@ -1,3 +1,10 @@
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\Achievement.java
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\AchievementChecker.java
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\AchievementController.java
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\AchievementRepository.java
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\AchievementService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\UserAchievement.java
+C:\CFNexus\backend\src\main\java\com\cfduel\achievement\UserAchievementRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\CustomOAuth2UserService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\OAuth2SuccessHandler.java
 C:\CFNexus\backend\src\main\java\com\cfduel\cf\CfApiClient.java
@@ -37,6 +44,15 @@ C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelResultRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelRoom.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelRoomRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\DuelService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\duel\event\DuelCompletedEvent.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\dto\FriendDto.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\dto\FriendNotification.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\dto\IncomingRequestDto.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\Friend.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendController.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendNotifier.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendRepository.java
+C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\dto\LeaderboardEntryDto.java
 C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\LeaderboardController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\LeaderboardRepository.java
@@ -55,6 +71,7 @@ C:\CFNexus\backend\src\main\java\com\cfduel\user\User.java
 C:\CFNexus\backend\src\main\java\com\cfduel\user\UserController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\user\UserRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\user\UserService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\ws\DisconnectForfeitService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\ws\DuelBroadcaster.java
 C:\CFNexus\backend\src\main\java\com\cfduel\ws\DuelWebSocketController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\ws\event\DrawDeclinedEvent.java

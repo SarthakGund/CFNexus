@@ -45,6 +45,7 @@ export default function DuelRoomPage({
   const participants = useDuelStore((s) => s.participants);
   const status = useDuelStore((s) => s.status);
   const drawOfferFrom = useDuelStore((s) => s.drawOfferFrom);
+  const disconnectDeadlines = useDuelStore((s) => s.disconnectDeadlines);
 
   const isHost = !!user && !!room && room.hostId === user.id;
 
@@ -93,6 +94,13 @@ export default function DuelRoomPage({
         <p className="mt-6 text-muted-foreground">This duel was cancelled.</p>
       )}
 
+      {/* Opponent disconnection countdown (spec §16). */}
+      <DisconnectBanner
+        deadlines={disconnectDeadlines}
+        participants={participants}
+        selfId={user?.id}
+      />
+
       {/* Draw offer prompt (only if someone else offered). */}
       {drawOfferFrom && user && drawOfferFrom !== user.id && (
         <DrawPrompt onRespond={respondDraw} />
@@ -120,6 +128,61 @@ function ConnectionBadge({ connected }: { connected: boolean }) {
         aria-hidden
       />
       {connected ? "Live" : "Connecting…"}
+    </div>
+  );
+}
+
+/**
+ * Renders a countdown banner for every disconnected opponent within their
+ * 30s grace period (spec §16). Ticks once a second; entries are cleared from
+ * the store on reconnect / duel end, and expired ones (deadline passed) stop
+ * rendering. The acting user's own disconnect entry is never shown.
+ */
+function DisconnectBanner({
+  deadlines,
+  participants,
+  selfId,
+}: {
+  deadlines: Record<string, number>;
+  participants: Participant[];
+  selfId?: string;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+
+  const entries = Object.entries(deadlines).filter(
+    ([userId]) => userId !== selfId,
+  );
+
+  useEffect(() => {
+    if (entries.length === 0) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [entries.length]);
+
+  const active = entries
+    .map(([userId, deadline]) => ({
+      userId,
+      secondsLeft: Math.max(0, Math.ceil((deadline - now) / 1000)),
+    }))
+    .filter((e) => e.secondsLeft > 0);
+
+  if (active.length === 0) return null;
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="mb-4 space-y-1 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3"
+    >
+      {active.map(({ userId, secondsLeft }) => {
+        const handle =
+          participants.find((p) => p.userId === userId)?.handle ?? "Opponent";
+        return (
+          <p key={userId} className="text-sm font-medium text-amber-600">
+            {handle} disconnected — forfeits in {secondsLeft}s
+          </p>
+        );
+      })}
     </div>
   );
 }

@@ -117,6 +117,11 @@ interface DuelState {
   elapsedMs: number;
   /** userId of whoever offered the still-pending draw, or null. */
   drawOfferFrom: string | null;
+  /**
+   * Disconnect grace-period deadlines, keyed by userId: the epoch-ms instant at
+   * which that player forfeits (spec §16). Cleared on reconnect / duel end.
+   */
+  disconnectDeadlines: Record<string, number>;
   result: DuelResult | null;
 
   setRoom: (room: RoomState) => void;
@@ -131,6 +136,7 @@ const initialState = {
   status: null as DuelStatus | null,
   elapsedMs: 0,
   drawOfferFrom: null as string | null,
+  disconnectDeadlines: {} as Record<string, number>,
   result: null as DuelResult | null,
 };
 
@@ -228,6 +234,7 @@ export const useDuelStore = create<DuelState>((set) => ({
             result,
             status: "COMPLETED",
             drawOfferFrom: null,
+            disconnectDeadlines: {},
             room: state.room
               ? { ...state.room, status: "COMPLETED" }
               : state.room,
@@ -240,14 +247,22 @@ export const useDuelStore = create<DuelState>((set) => ({
               ? { ...p, status: "DISCONNECTED" }
               : p,
           );
-          return { participants };
+          return {
+            participants,
+            disconnectDeadlines: {
+              ...state.disconnectDeadlines,
+              [event.userId]: Date.now() + event.gracePeriodSeconds * 1000,
+            },
+          };
         }
 
         case "PLAYER_RECONNECTED": {
           const participants = state.participants.map((p) =>
             p.userId === event.userId ? { ...p, status: "JOINED" } : p,
           );
-          return { participants };
+          const disconnectDeadlines = { ...state.disconnectDeadlines };
+          delete disconnectDeadlines[event.userId];
+          return { participants, disconnectDeadlines };
         }
 
         case "TIMER_UPDATE":
