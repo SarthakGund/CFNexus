@@ -2,6 +2,9 @@
 # All values bind to environment variables (spec §21) with localhost defaults
 # via ${VAR:default} so the app runs locally without a populated .env.
 
+dotenv:
+  directory: ../   # root .env is one level above backend/
+
 server:
   port: 8080
   servlet:

@@ -103,6 +103,13 @@
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!-- .env file support — reads root .env into Spring Environment -->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
