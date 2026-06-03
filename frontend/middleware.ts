@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Route protection. The backend uses Spring Session, whose default cookie is
- * `SESSION`; older servlet sessions use `JSESSIONID`. If neither cookie is
- * present on a protected route we bounce the user to /login.
+ * Route protection. The backend's Spring Session cookie is named
+ * `CFNEXUSSESSION` (server.servlet.session.cookie.name); `SESSION` /
+ * `JSESSIONID` are kept as fallbacks. If none is present on a protected route
+ * we bounce the user to /login.
  *
  * NOTE: this is a coarse presence check only. The backend remains the source
  * of truth and re-validates the session on every API call.
  */
-const SESSION_COOKIES = ["SESSION", "JSESSIONID"];
+const SESSION_COOKIES = ["CFNEXUSSESSION", "SESSION", "JSESSIONID"];
 
 export function middleware(request: NextRequest) {
   const hasSession = SESSION_COOKIES.some((name) =>

@@ -1,0 +1,11 @@
+-- CFNexus — make users.cf_user_id nullable.
+--
+-- Codeforces' OIDC login (and the public user.info API) do NOT expose a numeric
+-- user id: the OIDC `id_token` carries only an opaque `sub` hash, and user.info
+-- has no `id` field. The original NOT NULL on cf_user_id can therefore never be
+-- satisfied via login. Identity is the Codeforces handle (cf_handle is already
+-- UNIQUE NOT NULL and is what login matches on). Allow cf_user_id to be null.
+--
+-- The UNIQUE constraint is kept: PostgreSQL treats NULLs as distinct, so multiple
+-- users with a null cf_user_id are permitted.
+ALTER TABLE users ALTER COLUMN cf_user_id DROP NOT NULL;

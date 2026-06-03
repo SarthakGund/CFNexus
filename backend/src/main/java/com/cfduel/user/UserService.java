@@ -19,8 +19,8 @@ public class UserService {
 
     /**
      * Carrier for the Codeforces profile fields extracted during OAuth login.
-     * Only {@code handle} and {@code cfUserId} are required; the rest may be
-     * null when the CF user.info call has not (yet) populated them.
+     * Only {@code handle} is required; the rest (including {@code cfUserId}, which
+     * Codeforces no longer exposes) may be null.
      */
     public record OAuthUserInfo(
             String handle,

@@ -36,7 +36,9 @@ public class User {
     @Column(name = "cf_handle", nullable = false, unique = true, length = 50)
     private String cfHandle;
 
-    @Column(name = "cf_user_id", nullable = false, unique = true)
+    // Nullable: Codeforces OIDC/user.info expose no numeric user id (only an opaque
+    // `sub` hash). Identity is the handle; see migration V3.
+    @Column(name = "cf_user_id", unique = true)
     private Long cfUserId;
 
     @Column(name = "cf_rating")
