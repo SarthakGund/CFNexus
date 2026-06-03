@@ -173,3 +173,4 @@ coverage/
 .nyc_output/
 
 .claude/
+backend/src/main/resources/application-local.yml

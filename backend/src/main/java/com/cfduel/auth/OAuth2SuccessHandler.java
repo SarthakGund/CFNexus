@@ -43,7 +43,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             throws IOException, ServletException {
 
         if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
-            String handle = String.valueOf(oauthUser.getAttribute("handle"));
+            String handle = (String) oauthUser.getAttribute("handle");
             User user = userService.findByHandle(handle).orElseGet(() -> {
                 // Defensive: CustomOAuth2UserService should already have upserted.
                 Long id = toLong(oauthUser.getAttribute("id"));

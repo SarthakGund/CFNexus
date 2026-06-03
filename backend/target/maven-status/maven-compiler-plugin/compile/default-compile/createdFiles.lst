@@ -21,8 +21,10 @@ com\cfduel\duel\DuelRoom$DuelRoomBuilder.class
 com\cfduel\rating\RatingService$Decisive.class
 com\cfduel\achievement\Achievement$AchievementBuilder.class
 com\cfduel\cf\dto\CfRatingChange.class
+com\cfduel\auth\CustomOidcUserService.class
 com\cfduel\duel\DuelResultRepository.class
 com\cfduel\duel\DuelService.class
+com\cfduel\auth\CustomOAuth2UserService$2.class
 com\cfduel\auth\CustomOAuth2UserService.class
 com\cfduel\ws\DisconnectForfeitService.class
 com\cfduel\user\User.class
@@ -37,6 +39,7 @@ com\cfduel\leaderboard\LeaderboardRepository.class
 com\cfduel\rating\MatchHistoryRepository.class
 com\cfduel\rating\RatingHistory.class
 com\cfduel\user\User$UserBuilder.class
+com\cfduel\auth\CustomOAuth2UserService$1.class
 com\cfduel\cf\CfProblem.class
 com\cfduel\ws\event\TimerUpdateEvent.class
 com\cfduel\ws\event\DuelStartedEvent.class
@@ -71,6 +74,7 @@ com\cfduel\friend\dto\FriendNotification.class
 com\cfduel\user\dto\UpdateProfileRequest.class
 com\cfduel\friend\dto\IncomingRequestDto.class
 com\cfduel\ws\StompPrincipal.class
+com\cfduel\health\CheckpointController.class
 com\cfduel\friend\FriendService.class
 com\cfduel\rating\dto\PagedResponse.class
 com\cfduel\ws\event\PlayerDisconnectedEvent.class

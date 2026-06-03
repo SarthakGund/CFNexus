@@ -6,6 +6,7 @@ C:\CFNexus\backend\src\main\java\com\cfduel\achievement\AchievementService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\achievement\UserAchievement.java
 C:\CFNexus\backend\src\main\java\com\cfduel\achievement\UserAchievementRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\CustomOAuth2UserService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\auth\CustomOidcUserService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\OAuth2SuccessHandler.java
 C:\CFNexus\backend\src\main\java\com\cfduel\cf\CfApiClient.java
 C:\CFNexus\backend\src\main\java\com\cfduel\cf\CfProblem.java
@@ -53,6 +54,7 @@ C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendNotifier.java
 C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\friend\FriendService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\health\CheckpointController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\dto\LeaderboardEntryDto.java
 C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\LeaderboardController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\leaderboard\LeaderboardRepository.java
