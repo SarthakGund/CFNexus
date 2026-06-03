@@ -71,7 +71,9 @@ public class SecurityConfig {
                         "/api/users/*",
                         "/api/users/*/rating-history",
                         "/api/users/*/match-history",
-                        "/api/users/*/cf-rating-history").permitAll()
+                        "/api/users/*/cf-rating-history",
+                        // Public leaderboard (landing-page preview + /leaderboard, spec §13, §19).
+                        "/api/leaderboard").permitAll()
                 .anyRequest().authenticated())
             .oauth2Login(oauth -> oauth
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))

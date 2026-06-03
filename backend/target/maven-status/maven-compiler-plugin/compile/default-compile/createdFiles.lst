@@ -1,4 +1,5 @@
 com\cfduel\user\UserService$OAuthUserInfo.class
+com\cfduel\leaderboard\dto\LeaderboardEntryDto.class
 com\cfduel\duel\DuelResult.class
 com\cfduel\cf\dto\CfUserInfo.class
 com\cfduel\cf\CfApiClient$2.class
@@ -49,10 +50,11 @@ com\cfduel\user\UserController.class
 com\cfduel\user\UserService.class
 com\cfduel\ws\event\PlayerJoinedEvent.class
 com\cfduel\ws\event\RoomStateEvent.class
-com\cfduel\chat\ChatKeyRepository.class
+com\cfduel\leaderboard\LeaderboardController.class
 com\cfduel\duel\dto\CreateRoomResponse.class
 com\cfduel\ws\PresenceService.class
 com\cfduel\duel\DuelRoomRepository.class
+com\cfduel\leaderboard\LeaderboardRepository.class
 com\cfduel\rating\MatchHistory.class
 com\cfduel\chat\dto\ChatKeyDto.class
 com\cfduel\rating\MatchHistoryRepository.class

@@ -15,10 +15,7 @@
       "Bash(mvn -version)",
       "Bash(./mvnw -q -Djava.version=17 compile)",
       "Bash(mvn -q -Djava.version=17 compile)",
-      "Bash(npx eslint *)",
-      "Bash(npx next *)",
-      "Bash(echo \"TSC_EXIT=$?\")",
-      "PowerShell(mvn *)"
+      "Bash(npx next *)"
     ]
   }
 }
