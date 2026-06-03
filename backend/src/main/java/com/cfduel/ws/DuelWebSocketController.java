@@ -1,11 +1,17 @@
 package com.cfduel.ws;
 
 import com.cfduel.auth.OAuth2SuccessHandler;
+import com.cfduel.chat.ChatMessageStore;
+import com.cfduel.chat.ChatRateLimiter;
+import com.cfduel.duel.DuelParticipantRepository;
+import com.cfduel.duel.DuelRoom;
+import com.cfduel.duel.DuelRoomRepository;
 import com.cfduel.duel.DuelService;
 import com.cfduel.ws.event.DrawDeclinedEvent;
 import com.cfduel.ws.event.DrawOfferedEvent;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +36,10 @@ public class DuelWebSocketController {
     private final DuelBroadcaster broadcaster;
     private final DuelService duelService;
     private final PresenceService presenceService;
+    private final ChatRateLimiter chatRateLimiter;
+    private final ChatMessageStore chatMessageStore;
+    private final DuelRoomRepository roomRepository;
+    private final DuelParticipantRepository participantRepository;
 
     /** Player signals readiness in the lobby. Phase 2: log only (presence covers liveness). */
     @MessageMapping("/duel/{roomCode}/ready")
@@ -75,11 +85,36 @@ public class DuelWebSocketController {
     }
 
     /**
-     * Relay an end-to-end encrypted chat payload ({@code ciphertext, iv, senderPublicKey}).
-     * Phase 2 simply forwards it; rate-limiting/validation arrives in Phase 5.
+     * Relay an end-to-end encrypted chat payload ({@code ciphertext, iv,
+     * senderPublicKeyB64}) for a room (spec §11). The server is a pure relay: it
+     * validates the sender is a participant, enforces a per-user Redis rate limit,
+     * stashes the opaque ciphertext for late joiners, then broadcasts. The payload
+     * is never decrypted or logged.
      */
     @MessageMapping("/duel/{roomCode}/chat")
-    public void chat(@DestinationVariable String roomCode, @Payload Object payload) {
+    public void chat(@DestinationVariable String roomCode, @Payload Map<String, Object> payload,
+            Principal principal, SimpMessageHeaderAccessor headers) {
+        UUID userId = currentUserId(principal, headers);
+        if (userId == null) {
+            log.warn("chat without resolvable user, room={}", roomCode);
+            return;
+        }
+
+        // Sender must be a participant of the room.
+        Optional<DuelRoom> room = roomRepository.findByRoomCode(roomCode);
+        if (room.isEmpty()
+                || participantRepository.findByRoomIdAndUserId(room.get().getId(), userId).isEmpty()) {
+            log.warn("chat from non-participant user={} room={}", userId, roomCode);
+            return;
+        }
+
+        // Token-bucket rate limit (60/min/user); fails open if Redis is down.
+        if (!chatRateLimiter.allow(userId.toString())) {
+            log.debug("chat rate-limited user={} room={}", userId, roomCode);
+            return;
+        }
+
+        chatMessageStore.store(roomCode, payload);
         broadcaster.broadcastChat(roomCode, payload);
     }
 

@@ -28,6 +28,14 @@ public class DuelBroadcaster {
     }
 
     /**
+     * Broadcast the room's full set of chat public keys (spec §11) so every
+     * participant can (re)derive shared keys when someone joins or rotates keys.
+     */
+    public void broadcastChatKeys(String roomCode, Object keys) {
+        simpMessagingTemplate.convertAndSend("/topic/duel/" + roomCode + "/chat-keys", keys);
+    }
+
+    /**
      * Best-effort direct message to a single user via the user-destination prefix.
      * {@code sessionOrUserId} is the Principal name (the user UUID string) set by
      * the CONNECT interceptor.
