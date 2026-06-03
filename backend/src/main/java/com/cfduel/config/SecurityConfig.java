@@ -72,6 +72,10 @@ public class SecurityConfig {
                         "/api/users/*/rating-history",
                         "/api/users/*/match-history",
                         "/api/users/*/cf-rating-history",
+                        // Achievements grid is part of the public profile (spec §15):
+                        // catalogue + a user's earned set are readable anonymously.
+                        "/api/users/*/achievements",
+                        "/api/achievements",
                         // Public leaderboard (landing-page preview + /leaderboard, spec §13, §19).
                         "/api/leaderboard").permitAll()
                 .anyRequest().authenticated())

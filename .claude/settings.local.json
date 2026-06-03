@@ -15,7 +15,22 @@
       "Bash(mvn -version)",
       "Bash(./mvnw -q -Djava.version=17 compile)",
       "Bash(mvn -q -Djava.version=17 compile)",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(docker info *)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(docker compose *)",
+      "Bash(rm -f /tmp/cfnexus-boot.log)",
+      "Bash(nohup mvn -q -Djava.version=17 spring-boot:run)",
+      "Bash(echo \"started pid $!\")",
+      "Read(//tmp/**)",
+      "Bash(break)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/friends)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:8080/api/friends/request/foo)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/users/ghost/achievements)",
+      "Bash(docker exec *)",
+      "Bash(curl -s http://localhost:8080/api/users/tester/achievements -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:8080/api/users/tester -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(echo \"rc=$?\")"
     ]
   }
 }

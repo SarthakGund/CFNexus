@@ -9,6 +9,7 @@ import com.cfduel.duel.dto.JoinDuelRequest;
 import com.cfduel.duel.dto.ParticipantDto;
 import com.cfduel.duel.dto.ProblemDto;
 import com.cfduel.duel.dto.RoomStateDto;
+import com.cfduel.duel.event.DuelCompletedEvent;
 import com.cfduel.user.User;
 import com.cfduel.user.UserRepository;
 import com.cfduel.ws.DuelBroadcaster;
@@ -26,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,7 @@ public class DuelService {
     private final ProblemSelectionService problemSelectionService;
     private final RatingService ratingService;
     private final DuelBroadcaster broadcaster;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${app.frontend-origin:http://localhost:3000}")
     private String frontendOrigin;
@@ -333,6 +336,12 @@ public class DuelService {
 
         broadcaster.broadcast(roomCode, new DuelEndedEvent(
                 winnerUserId, loserIds, resultType, solveDurationMs));
+
+        // Notify the achievement subsystem (spec §13) once the result is committed.
+        eventPublisher.publishEvent(new DuelCompletedEvent(
+                room.getId(), room.getRoomType(), winnerUserId, loserIds,
+                resultType, solveDurationMs, room.getProblemId(),
+                room.getProblemRating(), winnerTeam));
     }
 
     /**
