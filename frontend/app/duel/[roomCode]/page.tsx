@@ -26,6 +26,8 @@ import { useDuel } from "@/hooks/useDuel";
 import { useDuelStore, type Participant } from "@/store/duelStore";
 import { DuelTimer } from "@/components/duel/DuelTimer";
 import { TeamSlotSelector } from "@/components/duel/TeamSlotSelector";
+import { CodeEditor } from "@/components/duel/CodeEditor";
+import { ChatPanel } from "@/components/duel/ChatPanel";
 
 const DRAW_AUTO_DECLINE_MS = 10_000;
 
@@ -286,43 +288,19 @@ function InProgressView({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">Editor (Phase 5)</CardTitle>
-            {problem && (
-              <Button asChild size="sm">
-                <a href={problem.url} target="_blank" rel="noreferrer">
-                  <ExternalLink />
-                  Submit on Codeforces
-                </a>
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent>
-            <textarea
-              aria-label="Code editor placeholder"
-              placeholder="// The Monaco editor arrives in Phase 5."
-              className="h-[60vh] w-full resize-none rounded-md border bg-muted/30 p-3 font-mono text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            />
-          </CardContent>
-        </Card>
+        <CodeEditor
+          roomCode={roomCode}
+          problemUrl={problem?.url}
+          contestId={problem?.contestId}
+          index={problem?.index}
+        />
       </div>
 
       {/* Participants bar */}
       <ParticipantsBar participants={participants} />
 
-      {/* Chat placeholder */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Chat</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Encrypted chat for room{" "}
-            <span className="font-mono">{roomCode}</span> arrives in Phase 5.
-          </p>
-        </CardContent>
-      </Card>
+      {/* End-to-end encrypted chat */}
+      <ChatPanel roomCode={roomCode} />
     </div>
   );
 }
