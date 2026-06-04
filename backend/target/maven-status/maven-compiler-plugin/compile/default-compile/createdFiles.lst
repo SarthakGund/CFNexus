@@ -96,6 +96,7 @@ com\cfduel\chat\dto\ChatKeyRequest.class
 com\cfduel\user\UserController.class
 com\cfduel\user\UserService.class
 com\cfduel\leaderboard\LeaderboardController.class
+com\cfduel\chat\ChatKeyRepository.class
 com\cfduel\duel\dto\CreateRoomResponse.class
 com\cfduel\config\ratelimit\RateLimitWebConfig.class
 com\cfduel\rating\MatchHistory.class

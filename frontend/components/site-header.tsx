@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Swords } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { NavActions } from "@/components/nav-actions";
 
 export function SiteHeader() {
   return (
@@ -11,15 +10,7 @@ export function SiteHeader() {
           <Swords className="h-5 w-5 text-primary" aria-hidden="true" />
           <span>CFNexus</span>
         </Link>
-        <nav className="flex items-center gap-2 text-sm">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/leaderboard">Leaderboard</Link>
-          </Button>
-          <ThemeToggle />
-          <Button asChild size="sm">
-            <Link href="/login">Login</Link>
-          </Button>
-        </nav>
+        <NavActions />
       </div>
     </header>
   );

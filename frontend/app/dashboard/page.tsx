@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { DashboardContent } from "./dashboard-content";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Your active duels, recent matches, and stats.",
+};
 
 export default function DashboardPage() {
   return (
-    <main className="container py-10">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <p className="mt-2 text-muted-foreground">
-        Your active duels, recent matches, and stats will appear here.
-      </p>
-    </main>
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main className="container flex-1 py-10">
+        <DashboardContent />
+      </main>
+      <SiteFooter />
+    </div>
   );
 }
