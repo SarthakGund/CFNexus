@@ -67,7 +67,6 @@ export interface CodeEditorProps {
  * Self-contained: the duel page drops in <CodeEditor … /> directly.
  */
 export function CodeEditor({
-  roomCode,
   problemUrl,
   contestId,
   index,

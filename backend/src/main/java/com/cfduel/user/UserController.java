@@ -5,11 +5,13 @@ import com.cfduel.user.dto.UpdateProfileRequest;
 import com.cfduel.user.dto.UserProfileDto;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +28,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
+
+    /** Whitelist for Codeforces handles (spec §11): 3–24 alphanumerics, underscore, hyphen. */
+    private static final String HANDLE_REGEX = "^[a-zA-Z0-9_\\-]{3,24}$";
+    private static final String HANDLE_MSG = "handle must be 3-24 chars of letters, digits, _ or -";
 
     private final UserService userService;
 
@@ -44,7 +51,8 @@ public class UserController {
 
     /** GET /api/users/{handle} — public profile by CF handle. */
     @GetMapping("/users/{handle}")
-    public ResponseEntity<UserProfileDto> getByHandle(@PathVariable String handle) {
+    public ResponseEntity<UserProfileDto> getByHandle(
+            @PathVariable @Pattern(regexp = HANDLE_REGEX, message = HANDLE_MSG) String handle) {
         User user = userService.findByHandle(handle)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return ResponseEntity.ok(UserProfileDto.from(user));
@@ -52,7 +60,11 @@ public class UserController {
 
     /** GET /api/users/search?q= — prefix search by handle. */
     @GetMapping("/users/search")
-    public List<UserProfileDto> search(@RequestParam("q") String query) {
+    public List<UserProfileDto> search(
+            @RequestParam("q")
+            @Pattern(regexp = "^[a-zA-Z0-9_\\-]{1,24}$",
+                    message = "search query must be 1-24 chars of letters, digits, _ or -")
+            String query) {
         return userService.search(query).stream()
                 .map(UserProfileDto::from)
                 .toList();

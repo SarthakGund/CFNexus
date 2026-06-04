@@ -8,6 +8,7 @@ import com.cfduel.rating.dto.RatingPointDto;
 import com.cfduel.user.User;
 import com.cfduel.user.UserRepository;
 import com.cfduel.user.UserService;
+import jakarta.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,9 +34,14 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/users/{handle}")
 @RequiredArgsConstructor
+@Validated
 public class ProfileController {
 
     private static final int MAX_PAGE_SIZE = 50;
+
+    /** Whitelist for Codeforces handles (spec §11): 3–24 alphanumerics, underscore, hyphen. */
+    private static final String HANDLE_REGEX = "^[a-zA-Z0-9_\\-]{3,24}$";
+    private static final String HANDLE_MSG = "handle must be 3-24 chars of letters, digits, _ or -";
 
     private final UserService userService;
     private final UserRepository userRepository;
@@ -44,7 +51,8 @@ public class ProfileController {
 
     /** GET /api/users/{handle}/rating-history — duel rating points, oldest first. */
     @GetMapping("/rating-history")
-    public List<RatingPointDto> ratingHistory(@PathVariable String handle) {
+    public List<RatingPointDto> ratingHistory(
+            @PathVariable @Pattern(regexp = HANDLE_REGEX, message = HANDLE_MSG) String handle) {
         User user = requireUser(handle);
         return ratingHistoryRepository.findByUserIdOrderByRecordedAtAsc(user.getId()).stream()
                 .map(RatingPointDto::from)
@@ -54,7 +62,7 @@ public class ProfileController {
     /** GET /api/users/{handle}/match-history?page=0&size=20 — paginated, newest first. */
     @GetMapping("/match-history")
     public PagedResponse<MatchHistoryDto> matchHistory(
-            @PathVariable String handle,
+            @PathVariable @Pattern(regexp = HANDLE_REGEX, message = HANDLE_MSG) String handle,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         User user = requireUser(handle);
@@ -74,7 +82,8 @@ public class ProfileController {
      * {@code user.rating} endpoint (cached + rate-gated in {@link CfApiClient}).
      */
     @GetMapping("/cf-rating-history")
-    public List<CfRatingChange> cfRatingHistory(@PathVariable String handle) {
+    public List<CfRatingChange> cfRatingHistory(
+            @PathVariable @Pattern(regexp = HANDLE_REGEX, message = HANDLE_MSG) String handle) {
         // Resolve to the canonical CF handle so casing matches CF's records.
         String cfHandle = userService.findByHandle(handle).map(User::getCfHandle).orElse(handle);
         return cfApiClient.getUserRating(cfHandle);
