@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function SiteHeader() {
   return (
@@ -14,6 +15,7 @@ export function SiteHeader() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/leaderboard">Leaderboard</Link>
           </Button>
+          <ThemeToggle />
           <Button asChild size="sm">
             <Link href="/login">Login</Link>
           </Button>

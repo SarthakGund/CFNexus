@@ -2,6 +2,7 @@ package com.cfduel.achievement;
 
 import com.cfduel.user.User;
 import com.cfduel.user.UserService;
+import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +25,12 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class AchievementController {
+
+    /** Whitelist for Codeforces handles (spec §11): 3–24 alphanumerics, underscore, hyphen. */
+    private static final String HANDLE_REGEX = "^[a-zA-Z0-9_\\-]{3,24}$";
+    private static final String HANDLE_MSG = "handle must be 3-24 chars of letters, digits, _ or -";
 
     private final AchievementRepository achievementRepository;
     private final UserAchievementRepository userAchievementRepository;
@@ -50,7 +57,8 @@ public class AchievementController {
 
     /** GET /api/users/{handle}/achievements — the user's earned achievements. */
     @GetMapping("/api/users/{handle}/achievements")
-    public List<EarnedAchievementDto> earned(@PathVariable String handle) {
+    public List<EarnedAchievementDto> earned(
+            @PathVariable @Pattern(regexp = HANDLE_REGEX, message = HANDLE_MSG) String handle) {
         User user = userService.findByHandle(handle)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 

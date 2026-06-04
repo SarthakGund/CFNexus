@@ -80,9 +80,14 @@ export function ChatPanel({ roomCode }: { roomCode: string }) {
     myPublicKeyB64,
   ]);
 
-  // Keep the newest message in view.
+  // Keep the newest message in view, honoring reduced-motion preferences.
   useEffect(() => {
-    listEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    listEndRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
   }, [messages]);
 
   const handleSend = useCallback(async () => {
