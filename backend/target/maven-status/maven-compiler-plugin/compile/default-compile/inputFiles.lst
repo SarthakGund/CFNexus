@@ -7,6 +7,7 @@ C:\CFNexus\backend\src\main\java\com\cfduel\achievement\UserAchievement.java
 C:\CFNexus\backend\src\main\java\com\cfduel\achievement\UserAchievementRepository.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\CustomOAuth2UserService.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\CustomOidcUserService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\auth\DevAuthController.java
 C:\CFNexus\backend\src\main\java\com\cfduel\auth\OAuth2SuccessHandler.java
 C:\CFNexus\backend\src\main\java\com\cfduel\cf\CfApiClient.java
 C:\CFNexus\backend\src\main\java\com\cfduel\cf\CfProblem.java
@@ -30,10 +31,12 @@ C:\CFNexus\backend\src\main\java\com\cfduel\code\CodeRunRateLimiter.java
 C:\CFNexus\backend\src\main\java\com\cfduel\code\CodeRunRequest.java
 C:\CFNexus\backend\src\main\java\com\cfduel\code\CodeRunResponse.java
 C:\CFNexus\backend\src\main\java\com\cfduel\code\CodeRunService.java
+C:\CFNexus\backend\src\main\java\com\cfduel\config\CsrfCookieFilter.java
 C:\CFNexus\backend\src\main\java\com\cfduel\config\ratelimit\ApiRateLimiter.java
 C:\CFNexus\backend\src\main\java\com\cfduel\config\ratelimit\ApiRateLimitInterceptor.java
 C:\CFNexus\backend\src\main\java\com\cfduel\config\ratelimit\RateLimitWebConfig.java
 C:\CFNexus\backend\src\main\java\com\cfduel\config\SecurityConfig.java
+C:\CFNexus\backend\src\main\java\com\cfduel\config\SpaCsrfTokenRequestHandler.java
 C:\CFNexus\backend\src\main\java\com\cfduel\config\ValidationExceptionHandler.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\dto\CreateDuelRequest.java
 C:\CFNexus\backend\src\main\java\com\cfduel\duel\dto\CreateRoomResponse.java

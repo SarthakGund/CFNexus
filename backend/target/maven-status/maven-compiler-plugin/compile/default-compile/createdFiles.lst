@@ -15,6 +15,7 @@ com\cfduel\duel\dto\ParticipantDto.class
 com\cfduel\code\CodeRunService.class
 com\cfduel\friend\dto\FriendDto.class
 com\cfduel\achievement\AchievementController$AchievementDto.class
+com\cfduel\config\CsrfCookieFilter.class
 com\cfduel\duel\DuelParticipantRepository.class
 com\cfduel\chat\ChatKey$ChatKeyBuilder.class
 com\cfduel\duel\DuelRoom$DuelRoomBuilder.class
@@ -54,6 +55,7 @@ com\cfduel\CfDuelApplication.class
 com\cfduel\rating\dto\MatchHistoryDto.class
 com\cfduel\code\CodeRunRateLimiter.class
 com\cfduel\cf\ProblemSelectionService.class
+com\cfduel\config\SpaCsrfTokenRequestHandler.class
 com\cfduel\friend\Friend.class
 com\cfduel\leaderboard\dto\LeaderboardEntryDto.class
 com\cfduel\duel\DuelResult.class
@@ -92,6 +94,7 @@ com\cfduel\chat\ChatController.class
 com\cfduel\chat\ChatKey.class
 com\cfduel\duel\DuelResult$DuelResultBuilder.class
 com\cfduel\achievement\AchievementController.class
+com\cfduel\auth\DevAuthController.class
 com\cfduel\chat\dto\ChatKeyRequest.class
 com\cfduel\user\UserController.class
 com\cfduel\user\UserService.class

@@ -44,6 +44,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns(frontendOrigin)
+                // Copy the (Spring Session-backed) HTTP session attributes — notably the
+                // {@code userId} set at login — into the WebSocket session attributes, so the
+                // CONNECT interceptor below can authenticate the STOMP session. Without this the
+                // handshake attributes are empty and every CONNECT is rejected as unauthenticated.
+                .addInterceptors(new org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor())
                 .withSockJS();
     }
 

@@ -61,19 +61,40 @@ public class SecurityConfig {
 
     private final CustomOidcUserService customOidcUserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final org.springframework.core.env.Environment environment;
 
     @Value("${app.frontend-origin:http://localhost:3000}")
     private String frontendOrigin;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // LOCAL-ONLY: the @Profile("local") DevAuthController exposes POST /api/dev/login
+        // (plan-v2 Stage 3). Permit it and exempt it from CSRF only when that profile is
+        // active, so the endpoint can never be reached in any other profile.
+        boolean localProfile = environment.matchesProfiles("local");
+
         http
             .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/ws/**")))
+            .csrf(csrf -> {
+                csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+                // SPA handler: render the token XOR-masked (BREACH protection) but accept the
+                // raw cookie value when echoed back via the X-XSRF-TOKEN header (how axios sends it).
+                csrf.csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler());
+                csrf.ignoringRequestMatchers(localProfile
+                        ? new AntPathRequestMatcher[] {
+                            new AntPathRequestMatcher("/ws/**"),
+                            new AntPathRequestMatcher("/api/dev/**")}
+                        : new AntPathRequestMatcher[] {new AntPathRequestMatcher("/ws/**")});
+            })
+            // Materialise the deferred CSRF token on every request so the XSRF-TOKEN cookie is
+            // written even on safe GETs (e.g. the SPA's initial /api/auth/me bootstrap).
+            .addFilterAfter(new CsrfCookieFilter(), org.springframework.security.web.authentication.www.BasicAuthenticationFilter.class)
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-            .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> {
+                if (localProfile) {
+                    auth.requestMatchers("/api/dev/**").permitAll();
+                }
+                auth
                 .requestMatchers(
                         "/",
                         "/error",
@@ -99,7 +120,8 @@ public class SecurityConfig {
                         "/api/achievements",
                         // Public leaderboard (landing-page preview + /leaderboard, spec §13, §19).
                         "/api/leaderboard").permitAll()
-                .anyRequest().authenticated())
+                .anyRequest().authenticated();
+            })
             .oauth2Login(oauth -> oauth
                 .tokenEndpoint(token -> token.accessTokenResponseClient(loggingTokenResponseClient()))
                 .userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
