@@ -2,128 +2,127 @@ package com.cfduel.code;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.net.http.HttpClient.Version;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Proxies code-run requests to a sandboxed Judge0 instance (spec §12).
- *
- * <p>Maps the six supported languages to Judge0 {@code language_id}s, enforces a
- * 10s CPU/wall limit, and normalises the Judge0 response into a
- * {@link CodeRunResponse}. All outbound failures degrade to a clear 502 so the
- * duel room never hangs on a flaky runner.
- */
 @Service
 @Slf4j
 public class CodeRunService {
 
-    /** 10s per-execution limit (spec §12). */
-    private static final double CPU_TIME_LIMIT_SEC = 10.0;
-    private static final double WALL_TIME_LIMIT_SEC = 10.0;
+    private static final int COMPILE_TIMEOUT_MS = 30_000;
+    private static final int RUN_TIMEOUT_MS = 10_000;
 
-    /** Language -> Judge0 language_id. Centralised per spec §12. */
-    private static final Map<String, Integer> LANGUAGE_IDS = Map.of(
-            "cpp", 54,        // C++ (GCC 9.2.0)
-            "python", 71,     // Python (3.8.1)
-            "java", 62,       // Java (OpenJDK 13.0.1)
-            "javascript", 63, // JavaScript (Node.js 12.14.0)
-            "go", 60,         // Go (1.13.5)
-            "rust", 73);      // Rust (1.40.0)
+    /** Language key -> [pistonLanguage, sourceFileName] */
+    private static final Map<String, String[]> LANGUAGE_META = Map.of(
+            "cpp",        new String[]{"c++",         "main.cpp"},
+            "python",     new String[]{"python",      "main.py"},
+            "java",       new String[]{"java",        "Main.java"},
+            "javascript", new String[]{"javascript",  "main.js"},
+            "go",         new String[]{"go",          "main.go"},
+            "rust",       new String[]{"rust",        "main.rs"});
 
-    private final RestClient restClient;
+    private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-    private final String apiKey;
+    private final String executeUrl;
 
     public CodeRunService(
             ObjectMapper objectMapper,
-            @Value("${app.code-runner.url}") String runnerUrl,
-            @Value("${app.code-runner.api-key}") String apiKey) {
+            @Value("${app.code-runner.url}") String runnerUrl) {
         this.objectMapper = objectMapper;
-        this.apiKey = apiKey == null ? "" : apiKey.trim();
-        this.restClient = RestClient.builder().baseUrl(runnerUrl).build();
+        this.httpClient = HttpClient.newBuilder().version(Version.HTTP_1_1).build();
+        this.executeUrl = runnerUrl + "/api/v2/execute";
     }
 
-    /**
-     * Submits {@code request} to Judge0 synchronously ({@code wait=true}) and maps
-     * the verdict back. Throws {@link ResponseStatusException} (400/502) on bad
-     * language or runner failure.
-     */
     public CodeRunResponse run(CodeRunRequest request) {
-        Integer languageId = LANGUAGE_IDS.get(request.language());
-        if (languageId == null) {
+        String[] meta = LANGUAGE_META.get(request.language());
+        if (meta == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported language");
         }
 
         ObjectNode body = objectMapper.createObjectNode();
-        body.put("source_code", request.code());
-        body.put("language_id", languageId);
+        body.put("language", meta[0]);
+        body.put("version", "*");
         body.put("stdin", request.stdin() == null ? "" : request.stdin());
-        body.put("cpu_time_limit", CPU_TIME_LIMIT_SEC);
-        body.put("wall_time_limit", WALL_TIME_LIMIT_SEC);
+        body.put("run_timeout", RUN_TIMEOUT_MS);
+        body.put("compile_timeout", COMPILE_TIMEOUT_MS);
+
+        ArrayNode files = body.putArray("files");
+        files.addObject()
+                .put("name", meta[1])
+                .put("content", request.code());
+
+        String bodyJson = body.toString();
+        log.debug("Piston request: {}", bodyJson);
 
         JsonNode result;
         try {
-            String response = restClient.post()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/submissions")
-                            .queryParam("base64_encoded", "false")
-                            .queryParam("wait", "true")
-                            .build())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("X-Auth-Token", apiKey)
-                    .body(body.toString())
-                    .retrieve()
-                    .body(String.class);
-            if (response == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Empty response from code runner");
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(executeUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(bodyJson, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(
+                    httpRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+            if (response.statusCode() >= 400) {
+                log.warn("Piston rejected: {} body={}", response.statusCode(), response.body());
+                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Code runner unavailable");
             }
-            result = objectMapper.readTree(response);
+            result = objectMapper.readTree(response.body());
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            log.warn("Judge0 call failed: {}", e.toString());
+            log.warn("Piston call failed: {}", e.toString());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Code runner unavailable");
         }
 
         return mapResult(result);
     }
 
-    /** Normalises a Judge0 submission result into {@link CodeRunResponse}. */
     private CodeRunResponse mapResult(JsonNode result) {
-        String stdout = textOrEmpty(result, "stdout");
-        String stderr = textOrEmpty(result, "stderr");
-        String compileOutput = textOrEmpty(result, "compile_output");
+        JsonNode compile = result.path("compile");
+        JsonNode run = result.path("run");
 
-        // Surface compile errors (which Judge0 reports separately) via stderr.
-        if (!compileOutput.isBlank()) {
-            stderr = stderr.isBlank() ? compileOutput : compileOutput + "\n" + stderr;
-        }
-        // Include a human-readable status message (e.g. "Time Limit Exceeded")
-        // when the program produced no other diagnostic output.
-        String statusDesc = textOrEmpty(result.path("status"), "description");
-        if (stdout.isBlank() && stderr.isBlank() && !statusDesc.isBlank()
-                && !"Accepted".equalsIgnoreCase(statusDesc)) {
-            stderr = statusDesc;
+        String stdout = textOrEmpty(run, "stdout");
+        String stderr = textOrEmpty(run, "stderr");
+
+        if (!compile.isMissingNode()) {
+            String compileStdout = textOrEmpty(compile, "stdout");
+            String compileStderr = textOrEmpty(compile, "stderr");
+            String compileOut = (compileStdout + compileStderr).trim();
+            if (!compileOut.isEmpty() && stdout.isBlank() && stderr.isBlank()) {
+                stderr = compileOut;
+            } else if (!compileStderr.isBlank()) {
+                stderr = compileStderr.isBlank() ? stderr : compileStderr + (stderr.isBlank() ? "" : "\n" + stderr);
+            }
         }
 
-        Integer exitCode = result.path("exit_code").isNumber()
-                ? result.path("exit_code").asInt() : null;
+        if (stdout.isBlank() && stderr.isBlank()) {
+            String signal = textOrEmpty(run, "signal");
+            if (!signal.isBlank()) stderr = signal;
+        }
+
+        Integer exitCode = run.path("code").isNumber() ? run.path("code").asInt() : null;
 
         Long executionTimeMs = null;
-        JsonNode time = result.path("time");
-        if (time.isNumber() || (time.isTextual() && !time.asText().isBlank())) {
+        JsonNode wallTime = run.path("wall_time");
+        if (!wallTime.isMissingNode() && !wallTime.isNull()) {
             try {
-                executionTimeMs = Math.round(Double.parseDouble(time.asText()) * 1000.0);
-            } catch (NumberFormatException ignored) {
-                // leave null
-            }
+                executionTimeMs = (long) wallTime.asDouble();
+            } catch (Exception ignored) {}
         }
 
         return new CodeRunResponse(stdout, stderr, exitCode, executionTimeMs);
