@@ -55,102 +55,32 @@ services:
       retries: 5
 
   # ---------------------------------------------------------------------------
-  # Judge0 — sandboxed code execution (spec §12). Judge0 needs its OWN
-  # dedicated Postgres + Redis, separate from the application ones above.
-  # The judge0 image runs the API server; judge0-workers runs the queue worker.
+  # Piston — sandboxed code execution (spec §12).
+  # Replaces Judge0: works on cgroup v2 (Docker Desktop / WSL2), no dedicated
+  # Postgres/Redis needed. Languages installed via POST /api/v2/packages after
+  # the container starts. API on port 2000.
   # ---------------------------------------------------------------------------
-  judge0-db:
-    image: postgres:16
-    container_name: cfnexus-judge0-db
+  piston:
+    image: ghcr.io/engineer-man/piston
+    container_name: cfnexus-piston
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${JUDGE0_DB_NAME:-judge0}
-      POSTGRES_USER: ${JUDGE0_DB_USERNAME:-judge0}
-      POSTGRES_PASSWORD: ${JUDGE0_DB_PASSWORD:-judge0secret}
-    volumes:
-      - judge0-db-data:/var/lib/postgresql/data
-    networks:
-      - cfnexus
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${JUDGE0_DB_USERNAME:-judge0}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  judge0-redis:
-    image: redis:7
-    container_name: cfnexus-judge0-redis
-    restart: unless-stopped
-    command: ["redis-server", "--requirepass", "${JUDGE0_REDIS_PASSWORD:-judge0redis}", "--appendonly", "yes"]
-    volumes:
-      - judge0-redis-data:/data
-    networks:
-      - cfnexus
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${JUDGE0_REDIS_PASSWORD:-judge0redis}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  judge0:
-    image: judge0/judge0:1.13.1
-    container_name: cfnexus-judge0
-    restart: unless-stopped
-    # privileged is required by Judge0 for its isolate sandbox (cgroups).
     privileged: true
-    env_file: .env
-    environment:
-      POSTGRES_HOST: judge0-db
-      POSTGRES_PORT: "5432"
-      POSTGRES_DB: ${JUDGE0_DB_NAME:-judge0}
-      POSTGRES_USER: ${JUDGE0_DB_USERNAME:-judge0}
-      POSTGRES_PASSWORD: ${JUDGE0_DB_PASSWORD:-judge0secret}
-      REDIS_HOST: judge0-redis
-      REDIS_PORT: "6379"
-      REDIS_PASSWORD: ${JUDGE0_REDIS_PASSWORD:-judge0redis}
-      # Optional API auth header expected by clients (matches CODE_RUNNER_API_KEY).
-      AUTHN_TOKEN: ${CODE_RUNNER_API_KEY:-judge0-api-key}
     ports:
-      - "2358:2358"
-    depends_on:
-      judge0-db:
-        condition: service_healthy
-      judge0-redis:
-        condition: service_healthy
+      - "2000:2000"
+    environment:
+      PISTON_COMPILE_TIMEOUT: "30000"
+      PISTON_RUN_TIMEOUT: "10000"
+    volumes:
+      - piston-packages:/piston/packages
+    tmpfs:
+      - /tmp:exec
     networks:
       - cfnexus
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O- http://localhost:2358/system_info >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O- http://localhost:2000/api/v2/runtimes >/dev/null 2>&1 || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 5
-
-  judge0-workers:
-    image: judge0/judge0:1.13.1
-    container_name: cfnexus-judge0-workers
-    restart: unless-stopped
-    privileged: true
-    env_file: .env
-    environment:
-      POSTGRES_HOST: judge0-db
-      POSTGRES_PORT: "5432"
-      POSTGRES_DB: ${JUDGE0_DB_NAME:-judge0}
-      POSTGRES_USER: ${JUDGE0_DB_USERNAME:-judge0}
-      POSTGRES_PASSWORD: ${JUDGE0_DB_PASSWORD:-judge0secret}
-      REDIS_HOST: judge0-redis
-      REDIS_PORT: "6379"
-      REDIS_PASSWORD: ${JUDGE0_REDIS_PASSWORD:-judge0redis}
-    # Override the entrypoint to run the async worker instead of the API server.
-    command: ["./scripts/workers"]
-    depends_on:
-      judge0:
-        condition: service_started
-      judge0-db:
-        condition: service_healthy
-      judge0-redis:
-        condition: service_healthy
-    networks:
-      - cfnexus
 
   # ---------------------------------------------------------------------------
   # Nginx — reverse proxy / TLS termination (spec §17). Routes /api, /ws,
@@ -235,5 +165,4 @@ networks:
 volumes:
   postgres-data:
   redis-data:
-  judge0-db-data:
-  judge0-redis-data:
+  piston-packages:

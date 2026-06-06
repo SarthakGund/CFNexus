@@ -104,7 +104,6 @@ app:
   cf:
     api-key: ${CF_API_KEY:}
     api-secret: ${CF_API_SECRET:}
-  # Code runner (Judge0) proxy target.
+  # Code runner (Piston) proxy target.
   code-runner:
-    url: ${CODE_RUNNER_URL:http://localhost:2358}
-    api-key: ${CODE_RUNNER_API_KEY:judge0-api-key}
+    url: ${CODE_RUNNER_URL:http://localhost:2000}
