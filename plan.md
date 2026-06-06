@@ -13,7 +13,7 @@ The build uses **maximum parallelism via Claude subagents**: each self-contained
 ### Backend
 | Layer | Technology |
 |---|---|
-| Framework | Spring Boot 3.x (Java 21) |
+| Framework | Spring Boot 3.x (Java 17) |
 | WebSocket | Spring WebSocket + STOMP |
 | Security | Spring Security 6, OAuth2 Client |
 | ORM | Spring Data JPA + Hibernate |

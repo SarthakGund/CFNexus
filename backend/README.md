@@ -1,6 +1,6 @@
 # CFNexus Backend — Bootstrap Notes
 
-Spring Boot 3.3.x / Java 21 / **Maven**. Package root: `com.cfduel`.
+Spring Boot 3.3.x / Java 17 / **Maven**. Package root: `com.cfduel`.
 
 ## Quick start
 

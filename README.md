@@ -32,7 +32,7 @@ live, with an ELO duel rating, end-to-end encrypted chat, an in-browser code edi
 
 | Layer | Backend | Frontend |
 |---|---|---|
-| **Language** | Java 21 (builds on JDK 17) | TypeScript |
+| **Language** | Java 17 | TypeScript |
 | **Framework** | Spring Boot 3.3 | Next.js 15 (App Router) · React 19 |
 | **Realtime** | Spring WebSocket + STOMP | SockJS + `@stomp/stompjs` |
 | **Auth/Security** | Spring Security 6 · OAuth2 Client (Codeforces) | session cookie via middleware |
@@ -79,7 +79,7 @@ live, with an ELO duel rating, end-to-end encrypted chat, an in-browser code edi
 ### Prerequisites
 
 - **Docker Desktop** (for Postgres, Redis, Piston, Nginx)
-- **JDK 17** (the backend targets 21 but compiles with a `-Djava.version=17` override)
+- **JDK 17**
 - **Maven** and **Node.js 20+**
 
 ### 1. Configure environment
@@ -106,12 +106,12 @@ mvn spring-boot:run                 # serves http://localhost:8080
 ```
 
 <details>
-<summary><b>Windows / JDK-17-only note</b></summary>
+<summary><b>Windows / PowerShell note</b></summary>
 
-If only JDK 17 is installed, override the target and **quote the `-D` args** (PowerShell otherwise mangles them):
+To run with the `local` profile, **quote the `-D` args** (PowerShell otherwise mangles them):
 
 ```powershell
-mvn "-Djava.version=17" spring-boot:run "-Dspring-boot.run.profiles=local"
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 </details>
 
@@ -240,7 +240,7 @@ node coderun-smoke.js   # /api/code/run proxy
 - Per-user Redis rate limiting (API, chat, code-run); all request bodies validated with Jakarta Bean Validation.
 - Chat is end-to-end encrypted — the server never holds decryption keys.
 
-> ⚠️ Before any public deployment, ensure no real secrets are committed (move `application-local.yml` secrets to an untracked file and **rotate** any that were ever committed).
+<!-- > ⚠️ Before any public deployment, ensure no real secrets are committed (move `application-local.yml` secrets to an untracked file and **rotate** any that were ever committed). -->
 
 ---
 

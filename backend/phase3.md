@@ -73,7 +73,7 @@
 - ✅ Recharts dependency added (`npm install recharts@^2.15.0`)
 
 ## Build Status
-- ✅ Backend: `mvn -Djava.version=17 compile` — clean
+- ✅ Backend: `mvn compile` — clean
 - ✅ Frontend: `next build` — 13 routes, `/u/[handle]` dynamic, no errors
 
 ## Verification Gate

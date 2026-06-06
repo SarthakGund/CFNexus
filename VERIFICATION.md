@@ -41,14 +41,14 @@ docker compose ps
 
 ```powershell
 cd backend
-mvn -q "-Djava.version=17" "-DskipTests" package            # compiles (JDK 17 override)
-mvn "-Djava.version=17" spring-boot:run "-Dspring-boot.run.profiles=local"
+mvn -q "-DskipTests" package            # compiles (Java 17)
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 - `GET /actuator/health` → `{"status":"UP"}`
 - `GET /api/leaderboard?type=duel_rating&size=5` → `200` (Flyway V1–V3 applied; data present)
 - `GET /swagger-ui.html` → `200`
 
-> Note (PowerShell): the `-D` args must be **quoted** (`"-Djava.version=17"`),
+> Note (PowerShell): `-D` args must be **quoted** (e.g. `"-DskipTests"`),
 > otherwise PowerShell mangles them into an invalid Maven lifecycle phase.
 
 ## Stage 2 — Frontend runs + talks to backend — **PASS**
@@ -164,7 +164,7 @@ Test scripts: `frontend/coderun-smoke.js`.
 
 ## Tooling / repro notes
 
-- Build with **JDK 17** (`-Djava.version=17`); backend targets 21.
+- Build with **JDK 17**; backend targets Java 17.
 - Run profile `local` (disables secure cookies, supplies creds).
 - PowerShell: quote `-D...` Maven args; native-exe `2>&1` wraps stderr — avoid.
 - Helper scripts live in `frontend/`: `duel-driver.js`, `chat-smoke.js`,

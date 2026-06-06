@@ -228,7 +228,7 @@ Phase 6 adds **friends system** for social interaction, **disconnection grace-pe
 - `frontend/app/duel/[roomCode]/page.tsx` — added `DisconnectBanner` component.
 
 ## Build & Type-Check Results
-- **Backend**: `mvn -q -Djava.version=17 compile` → ✅ SUCCESS
+- **Backend**: `mvn -q compile` → ✅ SUCCESS
   - Flyway: 2 migrations validated, schema v2.
   - Hibernate `ddl-auto: validate` passed (Friend, Achievement, UserAchievement entities mapped correctly).
   - 11 JPA repositories found, including new friend/achievement repos.

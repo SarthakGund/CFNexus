@@ -24,8 +24,8 @@ it, finding what breaks at runtime, and fixing the minimum to get a clean demo.
 ---
 
 ## Constraints (from project memory)
-- **Build with JDK 17**: only JDK 17 is installed locally; backend targets 21.
-  Compile/run with the `-Djava.version=17` override (Maven, not Gradle).
+- **Build with JDK 17**: backend targets Java 17 (`pom.xml` `<java.version>17</java.version>`).
+  Build/run with Maven (not Gradle).
 - Backend run profile: `local` (`application-local.yml` disables secure cookies,
   supplies creds).
 
@@ -38,8 +38,8 @@ it, finding what breaks at runtime, and fixing the minimum to get a clean demo.
 - **Outcome:** dependencies reachable on localhost.
 
 ## Stage 1 — Backend Boots Clean
-- Build: `mvn -q -Djava.version=17 -DskipTests package` from `backend/`.
-- Run: `mvn -Djava.version=17 spring-boot:run -Dspring-boot.run.profiles=local`.
+- Build: `mvn -q -DskipTests package` from `backend/`.
+- Run: `mvn spring-boot:run -Dspring-boot.run.profiles=local`.
 - Verify: Flyway applies V1–V3; `GET /actuator/health` → `UP`;
   `GET /swagger-ui.html` loads; `GET /api/leaderboard?type=duel_rating&size=5`
   returns 200 (empty list OK).

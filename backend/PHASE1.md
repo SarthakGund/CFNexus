@@ -29,7 +29,7 @@ Phase 1 established the full infrastructure, database schema, and basic authenti
 - SSL/HTTPS placeholders (443 block commented, certs from `/etc/letsencrypt/...`)
 
 ### Build Config (`pom.xml`, `application.yml`)
-- **Maven** — Spring Boot 3.3.4, Java 21
+- **Maven** — Spring Boot 3.3.4, Java 17
 - Dependencies: web, security, oauth2-client, websocket, data-jpa, data-redis, spring-session-data-redis, validation, actuator, flyway, postgresql, springdoc (Swagger), Lombok, Testcontainers
 - **application.yml** binds all environment variables (spec §21):
   - Datasource (PostgreSQL): `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`

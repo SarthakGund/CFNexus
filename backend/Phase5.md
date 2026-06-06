@@ -171,7 +171,7 @@ Phase 5 adds **end-to-end encrypted chat** between duel participants and a **Mon
 - `frontend/app/duel/[roomCode]/page.tsx` — integrated chat and editor components.
 
 ## Build & Type-Check Results
-- Backend: `mvn -q -DskipTests -Djava.version=17 compile` → ✅ SUCCESS
+- Backend: `mvn -q -DskipTests compile` → ✅ SUCCESS
 - Frontend: `npx tsc --noEmit` → ✅ CLEAN
 - Frontend: `npx next lint --file app/duel/[roomCode]/page.tsx` → ✅ NO ERRORS
 
